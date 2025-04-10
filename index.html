@@ -8,44 +8,99 @@
     body {
       margin: 0;
       font-family: 'Georgia', serif;
-      background-color: #fafafa;
-      color: #333;
-      line-height: 1.6;
+      background-color: #FAF9F6; /* soft off-white */
+      color: #444;
+      line-height: 1.7;
     }
+
     header {
-      background-color: #fff;
+      background-color: #EAD7D1; /* light dusty pink */
+      color: #3E3E3E;
       padding: 2rem;
       text-align: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     }
+
     h1 {
       font-size: 2.5rem;
       margin: 0;
+      font-weight: bold;
     }
+
     .container {
       max-width: 800px;
       margin: 2rem auto;
       padding: 0 1rem;
     }
+
+    .search-bar {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .search-bar input {
+      padding: 0.5rem 1rem;
+      width: 80%;
+      max-width: 400px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
     .poem {
-      background-color: #fff;
+      background-color: #ffffff;
       border-radius: 12px;
       padding: 1.5rem;
       margin-bottom: 2rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
+
+    .poem:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+      background-color: #fdfdfd;
+    }
+
     .poem h2 a {
       text-decoration: none;
       color: #333;
+      font-size: 1.5rem;
+      font-weight: bold;
     }
+
     .poem h2 a:hover {
-      color: #0077cc;
+      color: #b87b77; /* soft rose */
     }
+
     .genre {
       margin-top: 0.5rem;
       font-size: 0.9rem;
-      color: #777;
+      color: #888;
+      font-style: italic;
     }
+
+    .pagination {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .pagination button {
+      margin: 0 4px;
+      padding: 6px 12px;
+      border: none;
+      background-color: #eee;
+      font-family: inherit;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .pagination button.active {
+      background-color: #b87b77;
+      color: #fff;
+    }
+
     footer {
       text-align: center;
       padding: 1rem;
@@ -54,39 +109,83 @@
     }
   </style>
 </head>
+
 <body>
   <header>
     <h1>Ink of My Soul</h1>
     <p>Poetry by Dhanavan</p>
   </header>
+
   <div class="container">
-    <div class="poem">
-      <h2><a href="poems/held-without-hurt.html">Held Without Hurt</a></h2>
-      <div class="genre">Genre: Healing, Introspective Romance</div>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search poems..." onkeyup="searchPoems()" />
     </div>
-    <div class="poem">
-      <h2><a href="poems/never-really-over.html">Never Really Over</a></h2>
-      <div class="genre">Genre: Heartbreak, Emotional Closure</div>
-    </div>
-    <div class="poem">
-      <h2><a href="poems/intezaar.html">Intezaar</a></h2>
-      <div class="genre">Genre: Longing, Unspoken Love</div>
-    </div>
-    <div class="poem">
-      <h2><a href="poems/isnt-it-enough.html">Isn’t it enough</a></h2>
-      <div class="genre">Genre: Vulnerability, Self-Worth</div>
-    </div>
-    <div class="poem">
-      <h2><a href="poems/unromantic-romance.html">Unromantic Romance</a></h2>
-      <div class="genre">Genre: Love Lost, Disillusionment</div>
-    </div>
-    <div class="poem">
-      <h2><a href="poems/am-i-well.html">Am I Well?</a></h2>
-      <div class="genre">Genre: Mental Health, Inner Turmoil</div>
-    </div>
+
+    <div id="poemList"></div>
+    <div class="pagination" id="pagination"></div>
   </div>
+
   <footer>
     &copy; 2025 Dhanavan. All rights reserved.
   </footer>
+
+  <script>
+    const poems = [
+      { title: "Held Without Hurt", genre: "Healing, Introspective Romance", link: "poems/held-without-hurt.html" },
+      { title: "Never Really Over", genre: "Heartbreak, Emotional Closure", link: "poems/never-really-over.html" },
+      { title: "Intezaar", genre: "Longing, Unspoken Love", link: "poems/intezaar.html" },
+      { title: "Isn’t it enough", genre: "Vulnerability, Self-Worth", link: "poems/isnt-it-enough.html" },
+      { title: "Unromantic Romance", genre: "Love Lost, Disillusionment", link: "poems/unromantic-romance.html" },
+      { title: "Am I Well?", genre: "Mental Health, Inner Turmoil", link: "poems/am-i-well.html" },
+    ];
+
+    const poemsPerPage = 10;
+    let currentPage = 1;
+    let filteredPoems = poems;
+
+    function displayPoems(page = 1) {
+      const start = (page - 1) * poemsPerPage;
+      const end = start + poemsPerPage;
+      const poemList = document.getElementById("poemList");
+      poemList.innerHTML = "";
+
+      filteredPoems.slice(start, end).forEach(poem => {
+        poemList.innerHTML += `
+          <div class="poem">
+            <h2><a href="${poem.link}">${poem.title}</a></h2>
+            <div class="genre">Genre: ${poem.genre}</div>
+          </div>
+        `;
+      });
+
+      displayPagination();
+    }
+
+    function displayPagination() {
+      const pagination = document.getElementById("pagination");
+      const totalPages = Math.ceil(filteredPoems.length / poemsPerPage);
+      pagination.innerHTML = "";
+
+      for (let i = 1; i <= totalPages; i++) {
+        pagination.innerHTML += `
+          <button class="${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>
+        `;
+      }
+    }
+
+    function goToPage(page) {
+      currentPage = page;
+      displayPoems(page);
+    }
+
+    function searchPoems() {
+      const searchValue = document.getElementById("searchInput").value.toLowerCase();
+      filteredPoems = poems.filter(poem => poem.title.toLowerCase().includes(searchValue));
+      currentPage = 1;
+      displayPoems();
+    }
+
+    displayPoems();
+  </script>
 </body>
 </html>
